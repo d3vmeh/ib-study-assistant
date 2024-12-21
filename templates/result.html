@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Answer Result</title>
+    <!-- Add MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <style>
+        .correct { color: green; }
+        .incorrect { color: red; }
+        .explanation {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        /* Add some basic markdown styling */
+        .explanation h1 { font-size: 1.5em; }
+        .explanation h2 { font-size: 1.3em; }
+        .explanation h3 { font-size: 1.1em; }
+        .explanation code {
+            background: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .explanation pre {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        .math-display {
+            margin: 1em 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Result</h1>
+    <div>
+        <h3>Question:</h3>
+        <p>{{ question.question_text }}</p>
+        
+        <h3>Your Answer:</h3>
+        <p>{{ student_answer }}</p>
+        
+        <h3>Feedback:</h3>
+        {% if question.is_multiple_choice() %}
+            <p class="{% if is_correct %}correct{% else %}incorrect{% endif %}">
+                {{ "Correct!" if is_correct else "Incorrect" }}
+            </p>
+        {% else %}
+            <div class="explanation">
+                {{ explanation|safe }}
+            </div>
+        {% endif %}
+        
+        <h3>Markscheme:</h3>
+        <pre>{{ question.markscheme }}</pre>
+        
+        <a href="{{ url_for('index') }}">Back to Questions</a>
+    </div>
+</body>
+</html> 

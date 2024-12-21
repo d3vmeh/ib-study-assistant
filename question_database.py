@@ -4,7 +4,7 @@ import json
 import os
 from PIL import Image
 from enum import Enum
-
+from querying import grade_frq_response
 
 @dataclass
 class Question:
@@ -29,29 +29,44 @@ class Question:
         return None
     
     #Checking if the answer entered/selected is correct
-    def check_answer(self, student_answer: str) -> bool:
+    def check_answer(self, student_answer: str) -> tuple[bool, Optional[str]]:
+        """Returns a tuple of (is_correct: bool, explanation: Optional[str])"""
         if self.is_multiple_choice():
-            return student_answer.upper() == self.answer.upper()
+            is_correct = student_answer.upper() == self.answer.upper()
+            return is_correct, None #no explanation needed for MCQs
         else:
-            # this will involve LLM usage to examine the answer
-            pass
+            #FRQs -- get explanation from LLM
+            context = f"""
+                question: {self.question_text}
+                markscheme: {self.markscheme}
+                """
+            explanation = grade_frq_response(context, student_answer)
+            print(f"Explanation: {explanation}")
+            return None, explanation
 
     
 class QuestionBank:
     def __init__(self):
         self.questions = []
-        self.data_file = "questions.json"
+        self.data_file = "questions/physics/physics_questions.json"
         self.image_dir = "question_images"
-        os.makedirs(self.image_dir, exist_ok = True)
         self.load_questions()
     
     def load_questions(self):
-        if os.path.exists(self.data_file):
+        try:
             with open(self.data_file, 'r') as f:
                 data = json.load(f)
+                print(f"Loaded data: {data}")
                 for q in data:
                     question = Question(**q)
                     self.questions.append(question)
+                print(f"Loaded {len(self.questions)} questions")
+        except FileNotFoundError:
+            print(f"Could not find file: {self.data_file}")
+        except json.JSONDecodeError:
+            print(f"Error decoding JSON from: {self.data_file}")
+        except Exception as e:
+            print(f"Error loading questions: {str(e)}")
     
     def save_questions(self):
         data = []
@@ -144,17 +159,9 @@ class QuestionBank:
 def main():
     
     qb = QuestionBank()
-    qb.clear_questions()
-    print("Questions database cleared")
-    num_imported = qb.import_questions_from_file("questions/physics/physics_questions.json")
-    print(f"Successfully imported {num_imported} questions")
-
-    physics_questions = qb.get_questions_by_subject("Physics")
-    print(f"Total physics questions: {len(physics_questions)}")
-
-    qb.clear_questions()
-    print("Questions database cleared")
-    
+    print(f"Number of questions loaded: {len(qb.questions)}")
+    for q in qb.questions:
+        print(f"Question: {q.question_text}")
 
 if __name__ == "__main__":
     main()

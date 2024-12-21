@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IB Study Assistant</title>
+    <!-- Add MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <style>
+        .question-card {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+        .question-image {
+            max-width: 500px;
+            margin: 10px 0;
+        }
+        .math-display {
+            margin: 1em 0;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>IB Study Questions</h1>
+    {% for question in questions %}
+    <div class="question-card">
+        <h3>Question {{ question.id }} ({{ question.subject }} - {{ question.topic }})</h3>
+        <p>{{ question.question_text }}</p>
+        
+        {% if question.image_path %}
+        <img src="{{ url_for('static', filename=question.image_path) }}" class="question-image">
+        {% endif %}
+
+        <form action="{{ url_for('submit_answer', question_id=question.id) }}" method="post">
+            {% if question.is_multiple_choice() %}
+                {% for letter, text in question.options.items() %}
+                <div>
+                    <input type="radio" name="answer" value="{{ letter }}" id="{{ question.id }}_{{ letter }}">
+                    <label for="{{ question.id }}_{{ letter }}">{{ letter }}: {{ text }}</label>
+                </div>
+                {% endfor %}
+            {% else %}
+                <textarea name="answer" rows="4" cols="50"></textarea>
+            {% endif %}
+            <button type="submit">Submit Answer</button>
+        </form>
+    </div>
+    {% endfor %}
+</body>
+</html> 

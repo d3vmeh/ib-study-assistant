@@ -26,5 +26,14 @@
         "markscheme": "1. Use equation h = (v₀)²/2g [1 mark]\n2. h = (15)²/(2×9.81) [1 mark]\n3. h = 11.5 m [1 mark]",
         "difficulty": 2,
         "marks": 3
+    },
+    {
+        "id": "PHYS003",
+        "subject": "Physics",
+        "topic": "Mechanics",
+        "question_text": "Calculate the kinetic energy of a 2 kg object moving at 5 m/s. Use the equation $E_k = \\frac{1}{2}mv^2$.",
+        "question_type": "frq",
+        "answer": "25 J",
+        "markscheme": "1. Use $E_k = \\frac{1}{2}mv^2$ [1 mark]\n2. $E_k = \\frac{1}{2}(2)(5^2)$ [1 mark]\n3. $E_k = 25$ J [1 mark]"
     }
 ]
