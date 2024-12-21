@@ -1,0 +1,30 @@
+[
+    {
+        "id": "PHYS001",
+        "subject": "Physics",
+        "topic": "Mechanics",
+        "question_type": "mcq",
+        "question_text": "Which of the following best describes Newton's First Law?",
+        "options": {
+            "A": "An object in motion stays in motion unless acted upon by an external force",
+            "B": "Force equals mass times acceleration",
+            "C": "For every action there is an equal and opposite reaction",
+            "D": "The force of gravity is constant"
+        },
+        "answer": "A",
+        "markscheme": "A is correct because Newton's First Law states that an object will remain at rest or in uniform motion unless acted upon by an external force [1 mark]",
+        "difficulty": 1,
+        "marks": 1
+    },
+    {
+        "id": "PHYS002",
+        "subject": "Physics",
+        "topic": "Mechanics",
+        "question_type": "frq",
+        "question_text": "Calculate the maximum height reached by a ball thrown vertically upward with an initial velocity of 15 m/s. (g = 9.81 m/s²)",
+        "answer": "11.5 meters",
+        "markscheme": "1. Use equation h = (v₀)²/2g [1 mark]\n2. h = (15)²/(2×9.81) [1 mark]\n3. h = 11.5 m [1 mark]",
+        "difficulty": 2,
+        "marks": 3
+    }
+]
