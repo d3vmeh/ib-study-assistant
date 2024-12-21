@@ -19,7 +19,16 @@ class Question:
     image_path: Optional[str] = None
     difficulty: Optional[int] = None
     marks: Optional[int] = None
+    chat_history: str = ""
 
+    def add_to_chat_history(self, role: str, message: str):
+        """Add a message to the chat history"""
+        self.chat_history += f"{role}: {message}\n"
+
+    def clear_chat_history(self):
+        """Clear the chat history"""
+        self.chat_history = ""
+        
     def is_multiple_choice(self) -> bool:
         return self.question_type == "mcq"
     
@@ -44,7 +53,14 @@ class Question:
             print(f"Explanation: {explanation}")
             return None, explanation
 
-    
+    def add_to_chat_history(self, role: str, message: str):
+        """Add a message to the chat history"""
+        self.chat_history += f"{role}: {message}\n"
+
+    def clear_chat_history(self):
+        """Clear the chat history"""
+        self.chat_history = ""
+
 class QuestionBank:
     def __init__(self):
         self.questions = []

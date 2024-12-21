@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>IB Study Assistant</title>
-    <!-- Add MathJax -->
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script>
@@ -15,46 +14,801 @@
         };
     </script>
     <style>
-        .question-card {
-            border: 1px solid #ccc;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
-            margin: 10px;
+            background-color: #f5f7fa;
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .question-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .marks-badge {
+            background: #6c757d;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.9em;
+        }
+
+        .submit-loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            color: #666;
+        }
+
+        .question-meta {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .question-image {
+            max-width: 100%;
+            margin: 10px 0;
             border-radius: 5px;
         }
-        .question-image {
-            max-width: 500px;
-            margin: 10px 0;
+
+        .options-container {
+            display: grid;
+            gap: 10px;
+            margin: 15px 0;
         }
-        .math-display {
-            margin: 1em 0;
-            overflow-x: auto;
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-label:hover {
+            background: #e9ecef;
+        }
+
+        .option-label.correct {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option-label.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: inherit;
+        }
+
+        button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            transform: scale(1);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s;
+        }
+
+        button:active::after {
+            width: 200px;
+            height: 200px;
+            opacity: 0;
+        }
+
+        .send-message {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .send-message:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .clear-chat {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-chat:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .show-markscheme {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .show-markscheme:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        button[type="submit"] {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button[type="submit"]:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+        }
+
+        .feedback-container {
+            display: none;
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .feedback-container.correct {
+            background: #d4edda;
+            border: 1px solid #28a745;
+        }
+
+        .feedback-container.incorrect {
+            background: #f8d7da;
+            border: 1px solid #dc3545;
+        }
+
+        .markscheme {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 70%;
+            max-width: 700px;
+            position: relative;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: #000;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* Chat container styles */
+        .chat-container {
+            display: none;
+            margin-top: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        .message.ai {
+            align-items: flex-start;
+        }
+
+        .message-content {
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .user .message-content {
+            background: #007bff;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai .message-content {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .chat-input textarea {
+            flex-grow: 1;
+            margin-right: 10px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            resize: none;
+            height: 40px;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 15px;
+        }
+
+        .dots {
+            display: inline-flex;
+            gap: 4px;
+        }
+
+        .dots span {
+            width: 4px;
+            height: 4px;
+            background: #666;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dots span:nth-child(2) { animation-delay: 0.2s; }
+        .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+        }
+
+        .chat-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        .chat-section {
+            margin-top: 20px;
+            border-top: 1px solid #e9ecef;
+            padding-top: 20px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chat-header h4 {
+            margin: 0;
+            color: #495057;
+        }
+
+        .chat-messages {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message:last-child {
+            margin-bottom: 0;
+        }
+
+        .message.user {
+            align-items: flex-end;
+        }
+
+        .message.ai {
+            align-items: flex-start;
+        }
+
+        .message-content {
+            padding: 12px 16px;
+            border-radius: 15px;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+
+        .user .message-content {
+            background: #007bff;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai .message-content {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 5px;
+        }
+
+        .chat-input-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .chat-input-container textarea {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            resize: none;
+            height: 45px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input-container textarea:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+
+        .chat-input-container button {
+            padding: 8px 16px;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+
+        .send-message {
+            background: #28a745;
+        }
+
+        .send-message:hover {
+            background: #218838;
+        }
+
+        .clear-chat {
+            background: #dc3545;
+        }
+
+        .clear-chat:hover {
+            background: #c82333;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            align-self: flex-start;
+        }
+
+        .dots {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+            height: 20px;
+        }
+
+        .dots span {
+            width: 5px;
+            height: 5px;
+            background: #6c757d;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
+        }
+
+        .dots span:nth-child(2) { animation-delay: 0.2s; }
+        .dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-5px); }
+        }
+
+        /* Disable button styles */
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
         }
     </style>
 </head>
 <body>
     <h1>IB Study Questions</h1>
+    
     {% for question in questions %}
     <div class="question-card">
-        <h3>Question {{ question.id }} ({{ question.subject }} - {{ question.topic }})</h3>
-        <p>{{ question.question_text }}</p>
+        <div class="question-header">
+            <div class="question-info">
+                <h3>Question {{ question.id }}</h3>
+                <span class="marks-badge">{{ question.marks }} marks</span>
+            </div>
+            <div class="question-meta">
+                {{ question.subject }} - {{ question.topic }}
+            </div>
+        </div>
+
+        <div class="question-text">{{ question.question_text }}</div>
         
         {% if question.image_path %}
         <img src="{{ url_for('static', filename=question.image_path) }}" class="question-image">
         {% endif %}
 
-        <form action="{{ url_for('submit_answer', question_id=question.id) }}" method="post">
+        <form class="answer-form" data-question-id="{{ question.id }}">
             {% if question.is_multiple_choice() %}
-                {% for letter, text in question.options.items() %}
-                <div>
-                    <input type="radio" name="answer" value="{{ letter }}" id="{{ question.id }}_{{ letter }}">
-                    <label for="{{ question.id }}_{{ letter }}">{{ letter }}: {{ text }}</label>
+                <div class="options-container">
+                    {% for letter, text in question.options.items() %}
+                    <label class="option-label" data-option="{{ letter }}">
+                        <input type="radio" name="answer" value="{{ letter }}">
+                        <span>{{ letter }}: {{ text }}</span>
+                    </label>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             {% else %}
-                <textarea name="answer" rows="4" cols="50"></textarea>
+                <textarea name="answer" rows="4" placeholder="Enter your answer here..."></textarea>
+                <div class="submit-loading">
+                    <div class="dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span>AI is grading your answer...</span>
+                </div>
             {% endif %}
-            <button type="submit">Submit Answer</button>
+            <div class="button-group">
+                <button type="submit">Submit Answer</button>
+                <button type="button" class="show-markscheme" onclick="showMarkscheme('{{ question.id }}')">Show Markscheme</button>
+            </div>
         </form>
+
+        <div class="feedback-container"></div>
+
+        <div class="chat-section">
+            <div class="chat-header">
+                <h4>Discussion with AI Assistant</h4>
+                <button type="button" class="clear-chat">Clear Chat</button>
+            </div>
+            <div class="chat-messages">
+                <div class="typing-indicator">
+                    <div class="dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-container">
+                <textarea placeholder="Ask a question about this problem..."></textarea>
+                <button type="button" class="send-message">Send</button>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <script>
+        document.querySelectorAll('.question-card').forEach(questionCard => {
+            const form = questionCard.querySelector('.answer-form');
+            const submitButton = form.querySelector('button[type="submit"]');
+            const submitLoading = form.querySelector('.submit-loading');
+            const chatMessages = questionCard.querySelector('.chat-messages');
+            const typingIndicator = questionCard.querySelector('.typing-indicator');
+            const chatInput = questionCard.querySelector('.chat-input-container textarea');
+            const sendButton = questionCard.querySelector('.chat-input-container .send-message');
+            
+            let isSubmitting = false;  // Flag to prevent multiple submissions
+            let isChatting = false;   // Flag to prevent multiple chat requests
+
+            // Handle form submission
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                if (isSubmitting) return;  // Prevent multiple submissions
+                
+                const formData = new FormData(form);
+                const answer = formData.get('answer');
+                if (!answer) return;
+
+                isSubmitting = true;
+                submitButton.disabled = true;
+                
+                // Show loading for free response questions
+                const isMCQ = form.querySelector('input[type="radio"]');
+                if (!isMCQ) {
+                    submitLoading.style.display = 'flex';
+                }
+
+                try {
+                    const response = await fetch(`/answer/${form.dataset.questionId}`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (isMCQ) {
+                        // MCQ handling
+                        form.querySelectorAll('.option-label').forEach(label => {
+                            label.classList.remove('correct', 'incorrect');
+                        });
+                        
+                        const selectedLabel = form.querySelector(`[data-option="${answer}"]`);
+                        selectedLabel.classList.add(result.is_correct ? 'correct' : 'incorrect');
+                    } else {
+                        // FRQ handling
+                        submitLoading.style.display = 'none';
+                        
+                        // Create AI response message in chat
+                        const aiMsg = document.createElement('div');
+                        aiMsg.className = 'message ai';
+                        aiMsg.innerHTML = `
+                            <div class="message-content">
+                                <strong>Feedback on your answer:</strong><br>
+                                ${result.explanation}
+                            </div>
+                        `;
+                        chatMessages.appendChild(aiMsg);
+                        
+                        // Refresh MathJax
+                        if (window.MathJax) {
+                            MathJax.typesetPromise([aiMsg]);
+                        }
+                        
+                        // Scroll to show the new message
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    isSubmitting = false;
+                    submitButton.disabled = false;
+                    if (submitLoading) submitLoading.style.display = 'none';
+                }
+            });
+
+            // Chat message handling
+            async function sendMessage(content) {
+                if (isChatting) return;  // Prevent multiple chat requests
+                isChatting = true;
+                sendButton.disabled = true;
+
+                // Add user message to UI
+                const userMsg = document.createElement('div');
+                userMsg.className = 'message user';
+                userMsg.innerHTML = `<div class="message-content">${content}</div>`;
+                chatMessages.appendChild(userMsg);
+                
+                typingIndicator.style.display = 'block';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                try {
+                    const response = await fetch(`/chat/${form.dataset.questionId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ message: content })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    typingIndicator.style.display = 'none';
+                    
+                    const aiMsg = document.createElement('div');
+                    aiMsg.className = 'message ai';
+                    aiMsg.innerHTML = `<div class="message-content">${result.response}</div>`;
+                    chatMessages.appendChild(aiMsg);
+                    
+                    if (window.MathJax) {
+                        MathJax.typesetPromise([aiMsg]);
+                    }
+                    
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                } catch (error) {
+                    console.error('Error:', error);
+                    typingIndicator.style.display = 'none';
+                } finally {
+                    isChatting = false;
+                    sendButton.disabled = false;
+                }
+            }
+
+            // Clear chat history
+            questionCard.querySelector('.clear-chat').addEventListener('click', async () => {
+                const questionId = form.dataset.questionId;
+                
+                try {
+                    await fetch(`/clear-chat/${questionId}`, {
+                        method: 'POST'
+                    });
+                    
+                    // Clear chat messages from UI
+                    const messages = chatMessages.querySelectorAll('.message');
+                    messages.forEach(msg => {
+                        if (!msg.classList.contains('typing-indicator')) {
+                            msg.remove();
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error clearing chat:', error);
+                }
+            });
+
+            // Send message function
+            sendButton.addEventListener('click', () => {
+                const content = chatInput.value.trim();
+                if (content) {
+                    sendMessage(content);
+                    chatInput.value = '';
+                }
+            });
+            
+            // Handle enter key
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendButton.click();
+                }
+            });
+        });
+
+        function showMarkscheme(questionId) {
+            const modal = document.getElementById(`markscheme-modal-${questionId}`);
+            modal.style.display = "block";
+            
+            // Refresh MathJax rendering in the modal
+            if (window.MathJax) {
+                MathJax.typesetPromise([modal]);
+            }
+        }
+
+        function closeMarkscheme(questionId) {
+            const modal = document.getElementById(`markscheme-modal-${questionId}`);
+            modal.style.display = "none";
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = "none";
+            }
+        }
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                document.querySelectorAll('.modal').forEach(modal => {
+                    modal.style.display = "none";
+                });
+            }
+        });
+    </script>
+
+    {% for question in questions %}
+    <div id="markscheme-modal-{{ question.id }}" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeMarkscheme('{{ question.id }}')">&times;</span>
+            <h2>Markscheme for Question {{ question.id }}</h2>
+            <pre>{{ question.markscheme }}</pre>
+        </div>
     </div>
     {% endfor %}
 </body>

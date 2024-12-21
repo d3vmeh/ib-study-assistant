@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, jsonify
 from question_database import QuestionBank, Question
 import markdown2
+from querying import get_chat_response
 
 app = Flask(__name__)
 question_bank = QuestionBank()
@@ -17,15 +18,58 @@ def submit_answer(question_id):
     
     if question:
         is_correct, explanation = question.check_answer(student_answer)
-        # Convert markdown to HTML if explanation exists
         if explanation:
             explanation = markdown2.markdown(explanation)
-        return render_template('result.html', 
-                             question=question, 
-                             student_answer=student_answer, 
-                             is_correct=is_correct,
-                             explanation=explanation)
-    return redirect(url_for('index'))
+        
+        return jsonify({
+            'is_correct': is_correct,
+            'explanation': explanation
+        })
+    
+    return jsonify({'error': 'Question not found'}), 404
+
+@app.route('/chat/<question_id>', methods=['POST'])
+def chat(question_id):
+    data = request.json
+    question = next((q for q in question_bank.questions if q.id == question_id), None)
+    
+    if question and data.get('message'):
+        # Add student message to chat history
+        question.add_to_chat_history("Student", data['message'])
+        
+        answer_options = "This is a free response question, so no answer options are provided."
+        if question.question_type == "mcq":
+            answer_options = question.get_options()
+        
+        context = f"""
+        Question: {question.question_text}
+        Answer Options: {answer_options}
+        Markscheme: {question.markscheme}
+        
+        Chat History:
+        {question.chat_history}
+        """
+        
+        response = get_chat_response(context, data['message'])
+        
+        # Add AI response to chat history
+        question.add_to_chat_history("You", response)
+        
+        response_html = markdown2.markdown(response)
+        return jsonify({
+            'response': response_html,
+            'questionId': question_id
+        })
+    
+    return jsonify({'error': 'Invalid request'}), 400
+
+@app.route('/clear-chat/<question_id>', methods=['POST'])
+def clear_chat(question_id):
+    question = next((q for q in question_bank.questions if q.id == question_id), None)
+    if question:
+        question.clear_chat_history()
+        return jsonify({'status': 'success'})
+    return jsonify({'error': 'Question not found'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True) 
