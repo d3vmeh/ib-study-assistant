@@ -3,13 +3,16 @@
 <head>
     <title>IB Study Assistant</title>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
     <script>
         window.MathJax = {
             tex: {
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
                 displayMath: [['$$', '$$'], ['\\[', '\\]']],
                 processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
             }
         };
     </script>
@@ -215,27 +218,42 @@
         }
 
         .feedback-container {
-            display: none;
-            margin-top: 20px;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .feedback {
+            background: #f8f9fa;
             padding: 15px;
-            border-radius: 5px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            margin-bottom: 15px;
         }
 
-        .feedback-container.correct {
-            background: #d4edda;
-            border: 1px solid #28a745;
-        }
-
-        .feedback-container.incorrect {
-            background: #f8d7da;
-            border: 1px solid #dc3545;
+        .frq-feedback {
+            background: #e7f5ff;
+            border-color: #74c0fc;
         }
 
         .markscheme {
-            margin-top: 15px;
+            background: #f1f3f5;
             padding: 15px;
-            background: #f8f9fa;
-            border-radius: 5px;
+            border-radius: 8px;
+            border: 1px solid #adb5bd;
+            margin-bottom: 15px;
+        }
+
+        .feedback h4, .markscheme h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .error {
+            background: #fff5f5;
+            border-color: #ffa8a8;
+            color: #e03131;
         }
 
         /* Modal styles */
@@ -531,244 +549,463 @@
             transform: none !important;
             box-shadow: none !important;
         }
+
+        .menu-container {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+        .subject-select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .subject-select:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+
+        .topics-container {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .topics-container.show {
+            display: block;
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .topic-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .topic-checkbox:hover {
+            background: #e9ecef;
+            transform: translateY(-1px);
+        }
+
+        .topic-checkbox input[type="checkbox"] {
+            margin-right: 8px;
+        }
+
+        .subject-topics h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .filter-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .apply-filters {
+            background: #28a745;
+            color: white;
+        }
+
+        .apply-filters:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+        }
+
+        .clear-filters {
+            background: #6c757d;
+            color: white;
+        }
+
+        .clear-filters:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .no-questions {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            font-size: 1.2em;
+        }
+
+        .mathjax-content {
+            font-size: 1.1em;
+            line-height: 1.6;
+            margin: 15px 0;
+        }
+
+        .question-text {
+            margin-bottom: 20px;
+        }
+
+        .question-image-container {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Optional: Add image zoom on click */
+        .question-image.enlarged {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90vw;
+            max-height: 90vh;
+            z-index: 1000;
+            cursor: zoom-out;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <h1>IB Study Questions</h1>
-    
-    {% for question in questions %}
-    <div class="question-card">
-        <div class="question-header">
-            <div class="question-info">
-                <h3>Question {{ question.id }}</h3>
-                <span class="marks-badge">{{ question.marks }} marks</span>
+    <div class="menu-container">
+        <h2>Study Questions Filter</h2>
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="subject-select">Select Subject:</label>
+                <select id="subject-select" class="subject-select">
+                    <option value="">All Subjects</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject }}">{{ subject }}</option>
+                    {% endfor %}
+                </select>
             </div>
-            <div class="question-meta">
-                {{ question.subject }} - {{ question.topic }}
+            
+            <div class="topics-container" id="topics-container">
+                {% for subject, topics in topics_by_subject.items() %}
+                <div class="subject-topics" data-subject="{{ subject }}" style="display: none;">
+                    <h4>{{ subject }} Topics:</h4>
+                    <div class="topics-grid">
+                        {% for topic in topics %}
+                        <label class="topic-checkbox">
+                            <input type="checkbox" name="topic" value="{{ topic }}" data-subject="{{ subject }}">
+                            {{ topic }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
             </div>
         </div>
 
-        <div class="question-text">{{ question.question_text }}</div>
-        
-        {% if question.image_path %}
-        <img src="{{ url_for('static', filename=question.image_path) }}" class="question-image">
-        {% endif %}
-
-        <form class="answer-form" data-question-id="{{ question.id }}">
-            {% if question.is_multiple_choice() %}
-                <div class="options-container">
-                    {% for letter, text in question.options.items() %}
-                    <label class="option-label" data-option="{{ letter }}">
-                        <input type="radio" name="answer" value="{{ letter }}">
-                        <span>{{ letter }}: {{ text }}</span>
-                    </label>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <textarea name="answer" rows="4" placeholder="Enter your answer here..."></textarea>
-                <div class="submit-loading">
-                    <div class="dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                    <span>AI is grading your answer...</span>
-                </div>
-            {% endif %}
-            <div class="button-group">
-                <button type="submit">Submit Answer</button>
-                <button type="button" class="show-markscheme" onclick="showMarkscheme('{{ question.id }}')">Show Markscheme</button>
-            </div>
-        </form>
-
-        <div class="feedback-container"></div>
-
-        <div class="chat-section">
-            <div class="chat-header">
-                <h4>Discussion with AI Assistant</h4>
-                <button type="button" class="clear-chat">Clear Chat</button>
-            </div>
-            <div class="chat-messages">
-                <div class="typing-indicator">
-                    <div class="dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-            </div>
-            <div class="chat-input-container">
-                <textarea placeholder="Ask a question about this problem..."></textarea>
-                <button type="button" class="send-message">Send</button>
-            </div>
+        <div class="filter-actions">
+            <button class="filter-button apply-filters" id="apply-filters">Apply Filters</button>
+            <button class="filter-button clear-filters" id="clear-filters">Clear Filters</button>
         </div>
     </div>
-    {% endfor %}
+
+    <div id="questions-container">
+        {% for question in questions %}
+        <div class="question-card">
+            <div class="question-header">
+                <div class="question-info">
+                    <h3>Question {{ question.id }}</h3>
+                    <span class="marks-badge">{{ question.marks }} marks</span>
+                </div>
+                <div class="question-meta">
+                    {{ question.subject }} - {{ question.topic }}
+                </div>
+            </div>
+
+            <div class="question-text mathjax-content">
+                {{ question.question_text | safe }}
+            </div>
+            
+            {% if question.image_path %}
+            <div class="question-image-container">
+                <img src="{{ url_for('static', filename='question_images/' + question.image_path) }}" 
+                     alt="Question image"
+                     class="question-image">
+            </div>
+            {% endif %}
+
+            <form class="answer-form" data-question-id="{{ question.id }}">
+                {% if question.is_multiple_choice() %}
+                    <div class="options-container">
+                        {% for letter, text in question.options.items() %}
+                        <label class="option-label" data-option="{{ letter }}">
+                            <input type="radio" name="answer" value="{{ letter }}">
+                            <span>{{ letter }}: {{ text }}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <textarea name="answer" rows="4" placeholder="Enter your answer here..."></textarea>
+                    <div class="submit-loading">
+                        <div class="dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <span>AI is grading your answer...</span>
+                    </div>
+                {% endif %}
+                <div class="button-group">
+                    <button type="submit">Submit Answer</button>
+                    <button type="button" class="show-markscheme">Show Markscheme</button>
+                </div>
+            </form>
+
+            <div class="feedback-container"></div>
+
+            <div class="chat-section">
+                <div class="chat-header">
+                    <h4>Discussion with AI Assistant</h4>
+                    <button type="button" class="clear-chat">Clear Chat</button>
+                </div>
+                <div class="chat-messages">
+                    <div class="typing-indicator">
+                        <div class="dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <textarea placeholder="Ask a question about this problem..."></textarea>
+                    <button type="button" class="send-message">Send</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 
     <script>
-        document.querySelectorAll('.question-card').forEach(questionCard => {
-            const form = questionCard.querySelector('.answer-form');
-            const submitButton = form.querySelector('button[type="submit"]');
-            const submitLoading = form.querySelector('.submit-loading');
-            const chatMessages = questionCard.querySelector('.chat-messages');
-            const typingIndicator = questionCard.querySelector('.typing-indicator');
-            const chatInput = questionCard.querySelector('.chat-input-container textarea');
-            const sendButton = questionCard.querySelector('.chat-input-container .send-message');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize all question cards
+            initializeQuestionCards();
             
-            let isSubmitting = false;  // Flag to prevent multiple submissions
-            let isChatting = false;   // Flag to prevent multiple chat requests
-
-            // Handle form submission
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                if (isSubmitting) return;  // Prevent multiple submissions
-                
-                const formData = new FormData(form);
-                const answer = formData.get('answer');
-                if (!answer) return;
-
-                isSubmitting = true;
-                submitButton.disabled = true;
-                
-                // Show loading for free response questions
-                const isMCQ = form.querySelector('input[type="radio"]');
-                if (!isMCQ) {
-                    submitLoading.style.display = 'flex';
-                }
-
-                try {
-                    const response = await fetch(`/answer/${form.dataset.questionId}`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    
-                    const result = await response.json();
-                    
-                    if (isMCQ) {
-                        // MCQ handling
-                        form.querySelectorAll('.option-label').forEach(label => {
-                            label.classList.remove('correct', 'incorrect');
-                        });
-                        
-                        const selectedLabel = form.querySelector(`[data-option="${answer}"]`);
-                        selectedLabel.classList.add(result.is_correct ? 'correct' : 'incorrect');
-                    } else {
-                        // FRQ handling
-                        submitLoading.style.display = 'none';
-                        
-                        // Create AI response message in chat
-                        const aiMsg = document.createElement('div');
-                        aiMsg.className = 'message ai';
-                        aiMsg.innerHTML = `
-                            <div class="message-content">
-                                <strong>Feedback on your answer:</strong><br>
-                                ${result.explanation}
-                            </div>
-                        `;
-                        chatMessages.appendChild(aiMsg);
-                        
-                        // Refresh MathJax
-                        if (window.MathJax) {
-                            MathJax.typesetPromise([aiMsg]);
-                        }
-                        
-                        // Scroll to show the new message
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                } finally {
-                    isSubmitting = false;
-                    submitButton.disabled = false;
-                    if (submitLoading) submitLoading.style.display = 'none';
-                }
-            });
-
-            // Chat message handling
-            async function sendMessage(content) {
-                if (isChatting) return;  // Prevent multiple chat requests
-                isChatting = true;
-                sendButton.disabled = true;
-
-                // Add user message to UI
-                const userMsg = document.createElement('div');
-                userMsg.className = 'message user';
-                userMsg.innerHTML = `<div class="message-content">${content}</div>`;
-                chatMessages.appendChild(userMsg);
-                
-                typingIndicator.style.display = 'block';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                
-                try {
-                    const response = await fetch(`/chat/${form.dataset.questionId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ message: content })
-                    });
-                    
-                    const result = await response.json();
-                    
-                    typingIndicator.style.display = 'none';
-                    
-                    const aiMsg = document.createElement('div');
-                    aiMsg.className = 'message ai';
-                    aiMsg.innerHTML = `<div class="message-content">${result.response}</div>`;
-                    chatMessages.appendChild(aiMsg);
-                    
-                    if (window.MathJax) {
-                        MathJax.typesetPromise([aiMsg]);
-                    }
-                    
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                } catch (error) {
-                    console.error('Error:', error);
-                    typingIndicator.style.display = 'none';
-                } finally {
-                    isChatting = false;
-                    sendButton.disabled = false;
-                }
+            // Re-initialize after filtering
+            const applyFiltersBtn = document.getElementById('apply-filters');
+            if (applyFiltersBtn) {
+                applyFiltersBtn.addEventListener('click', async () => {
+                    // ... your existing filter code ...
+                    initializeQuestionCards(); // Re-initialize after content update
+                });
             }
-
-            // Clear chat history
-            questionCard.querySelector('.clear-chat').addEventListener('click', async () => {
-                const questionId = form.dataset.questionId;
-                
-                try {
-                    await fetch(`/clear-chat/${questionId}`, {
-                        method: 'POST'
-                    });
-                    
-                    // Clear chat messages from UI
-                    const messages = chatMessages.querySelectorAll('.message');
-                    messages.forEach(msg => {
-                        if (!msg.classList.contains('typing-indicator')) {
-                            msg.remove();
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error clearing chat:', error);
-                }
-            });
-
-            // Send message function
-            sendButton.addEventListener('click', () => {
-                const content = chatInput.value.trim();
-                if (content) {
-                    sendMessage(content);
-                    chatInput.value = '';
-                }
-            });
-            
-            // Handle enter key
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendButton.click();
-                }
-            });
         });
+
+        function initializeQuestionCards() {
+            document.querySelectorAll('.question-card').forEach(card => {
+                // Get elements
+                const form = card.querySelector('.answer-form');
+                const chatInput = card.querySelector('.chat-input-container textarea');
+                const sendButton = card.querySelector('.send-message');
+                const clearChatButton = card.querySelector('.clear-chat');
+                const showMarkschemeButton = card.querySelector('.show-markscheme');
+                const chatMessages = card.querySelector('.chat-messages');
+                const feedbackContainer = card.querySelector('.feedback-container');
+                
+                // 1. Submit Answer Handler
+                if (form) {
+                    form.onsubmit = async (e) => {
+                        e.preventDefault();
+                        console.log('Form submitted'); // Debug log
+                        
+                        const formData = new FormData(form);
+                        const answer = formData.get('answer');
+                        if (!answer) return;
+
+                        try {
+                            const response = await fetch(`/answer/${form.dataset.questionId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ answer: answer })
+                            });
+
+                            const result = await response.json();
+                            console.log('Response received:', result); // Debug log
+
+                            feedbackContainer.innerHTML = `
+                                <div class="feedback">
+                                    <h4>AI Feedback:</h4>
+                                    ${result.explanation || result.feedback}
+                                </div>
+                            `;
+
+                            if (window.MathJax) {
+                                MathJax.typesetPromise([feedbackContainer]);
+                            }
+                        } catch (error) {
+                            console.error('Submit error:', error);
+                        }
+                    };
+                }
+
+                // 2. Show Markscheme Handler
+                if (showMarkschemeButton) {
+                    showMarkschemeButton.onclick = async () => {
+                        console.log('Show markscheme clicked'); // Debug log
+                        try {
+                            const response = await fetch(`/markscheme/${form.dataset.questionId}`);
+                            const result = await response.json();
+                            
+                            feedbackContainer.innerHTML = `
+                                <div class="markscheme">
+                                    <h4>Markscheme:</h4>
+                                    ${result.markscheme}
+                                </div>
+                            `;
+
+                            if (window.MathJax) {
+                                MathJax.typesetPromise([feedbackContainer]);
+                            }
+                        } catch (error) {
+                            console.error('Markscheme error:', error);
+                        }
+                    };
+                }
+
+                // 3. Send Chat Message Handler
+                if (sendButton && chatInput) {
+                    sendButton.onclick = async () => {
+                        const content = chatInput.value.trim();
+                        if (!content) return;
+
+                        const typingIndicator = card.querySelector('.typing-indicator');
+                        chatInput.value = '';
+
+                        // Add user message
+                        const userMsg = document.createElement('div');
+                        userMsg.className = 'message user';
+                        userMsg.innerHTML = `<div class="message-content">${content}</div>`;
+                        chatMessages.appendChild(userMsg);
+
+                        if (typingIndicator) typingIndicator.style.display = 'block';
+
+                        try {
+                            const response = await fetch(`/chat/${form.dataset.questionId}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({ message: content })
+                            });
+
+                            const result = await response.json();
+                            
+                            if (typingIndicator) typingIndicator.style.display = 'none';
+
+                            const aiMsg = document.createElement('div');
+                            aiMsg.className = 'message ai';
+                            aiMsg.innerHTML = `<div class="message-content">${result.response}</div>`;
+                            chatMessages.appendChild(aiMsg);
+
+                            if (window.MathJax) {
+                                MathJax.typesetPromise([aiMsg]);
+                            }
+
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        } catch (error) {
+                            console.error('Chat error:', error);
+                            if (typingIndicator) typingIndicator.style.display = 'none';
+                        }
+                    };
+                }
+
+                // 4. Clear Chat Handler
+                if (clearChatButton) {
+                    clearChatButton.onclick = async () => {
+                        try {
+                            await fetch(`/clear-chat/${form.dataset.questionId}`, {
+                                method: 'POST'
+                            });
+                            
+                            const messages = chatMessages.querySelectorAll('.message:not(.typing-indicator)');
+                            messages.forEach(msg => msg.remove());
+                        } catch (error) {
+                            console.error('Clear chat error:', error);
+                        }
+                    };
+                }
+
+                // 5. Chat Enter Key Handler
+                if (chatInput) {
+                    chatInput.onkeypress = (e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendButton.click();
+                        }
+                    };
+                }
+            });
+        }
 
         function showMarkscheme(questionId) {
             const modal = document.getElementById(`markscheme-modal-${questionId}`);
@@ -811,5 +1048,7 @@
         </div>
     </div>
     {% endfor %}
+
+    <div class="overlay"></div>
 </body>
 </html> 

@@ -1,0 +1,38 @@
+[
+    {
+        "id": "DT001",
+        "subject": "Design Technology",
+        "topic": "Human Factors and Ergonomics",
+        "question_text": "Explain three key anthropometric considerations when designing an office chair.",
+        "question_type": "frq",
+        "answer": "Seat height adjustability, lumbar support, and armrest positioning",
+        "markscheme": "1. Seat height adjustability (should accommodate 5th-95th percentile) [1]\n2. Lumbar support (should match natural spine curvature) [1]\n3. Armrest positioning (should support elbows at 90 degrees) [1]\nEach point must include both the feature and its ergonomic justification.",
+        "marks": 3
+    },
+    {
+        "id": "DT002",
+        "subject": "Design Technology",
+        "topic": "Sustainability in Design",
+        "question_text": "What is the 'cradle-to-cradle' design concept and how does it differ from traditional linear manufacturing?",
+        "question_type": "frq",
+        "answer": "Cradle-to-cradle design focuses on creating products that can be fully recycled or biodegraded, eliminating waste, unlike linear 'take-make-dispose' approaches.",
+        "markscheme": "1. Definition of cradle-to-cradle (closed loop system) [1]\n2. Explanation of how materials are reused/recycled [1]\n3. Contrast with linear manufacturing [1]\n4. Example of application [1]",
+        "marks": 4
+    },
+    {
+        "id": "DT003",
+        "subject": "Design Technology",
+        "topic": "Innovation and Design",
+        "question_text": "Which of these is NOT a principle of iterative design?",
+        "question_type": "mcq",
+        "options": {
+            "A": "Testing with users",
+            "B": "Making incremental improvements",
+            "C": "Creating a perfect first prototype",
+            "D": "Learning from failures"
+        },
+        "answer": "C",
+        "markscheme": "C is correct. Creating a perfect first prototype contradicts the iterative design process, which is based on continuous improvement through testing and refinement.",
+        "marks": 1
+    }
+]

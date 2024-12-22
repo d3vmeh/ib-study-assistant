@@ -34,6 +34,20 @@
         "question_text": "Calculate the kinetic energy of a 2 kg object moving at 5 m/s. Use the equation $E_k = \\frac{1}{2}mv^2$.",
         "question_type": "frq",
         "answer": "25 J",
-        "markscheme": "1. Use $E_k = \\frac{1}{2}mv^2$ [1 mark]\n2. $E_k = \\frac{1}{2}(2)(5^2)$ [1 mark]\n3. $E_k = 25$ J [1 mark]"
+        "markscheme": "1. Use $E_k = \\frac{1}{2}mv^2$ [1 mark]\n2. $E_k = \\frac{1}{2}(2)(5^2)$ [1 mark]\n3. $E_k = 25$ J [1 mark]",
+        "difficulty": 2,
+        "marks": 3
+    },
+    {
+        "id": "PHYS004",
+        "subject": "Physics",
+        "topic": "Mechanics",
+        "question_text": "This question is about forces in the human body. The lower jawbone of the human may be represented by the model below.The jawbone has negligible mass. It consists of two straight parts of length 7.0 cm and 4.0 cm making an angle of 50° to each other. During one particular bite, a force of 45 N is applied by the teeth at the front of the jawbone. Calculate the magnitude M of the force applied by the masseter muscle.",
+        "image_path": "PHYS004.jpg",
+        "question_type": "frq",
+        "answer": "168 N",
+        "markscheme": "taking torques about an axis through the pivot gives 45 * (7.0 + 4.0 cos(50 deg)) = M * 40(cos(50deg)). M = 168 N. [2 max]. Award [0] for an attempt at moments but with errors, e.g. without cos factor.",
+        "difficulty": 2,
+        "marks": 2
     }
 ]

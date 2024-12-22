@@ -1,0 +1,32 @@
+[
+    {
+        "id": "MATH001",
+        "subject": "Mathematics",
+        "topic": "Number and Algebra",
+        "question_text": "Solve the complex equation: $z^2 + 4z + 13 = 0$. Express your answer in the form $a + bi$.",
+        "question_type": "frq",
+        "answer": "-2 ± 3i",
+        "markscheme": "1. Use quadratic formula: $z = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$ [1]\n2. $z = \\frac{-4 \\pm \\sqrt{16-52}}{2}$ [1]\n3. $z = \\frac{-4 \\pm \\sqrt{-36}}{2}$ [1]\n4. $z = \\frac{-4 \\pm 6i}{2}$ [1]\n5. $z = -2 \\pm 3i$ [1]",
+        "marks": 5
+    },
+    {
+        "id": "MATH002",
+        "subject": "Mathematics",
+        "topic": "Functions",
+        "question_text": "Find the domain of the function $f(x) = \\ln(x^2 - 4)$.",
+        "question_type": "frq",
+        "answer": "x < -2 or x > 2",
+        "markscheme": "1. Inside ln must be positive: $x^2 - 4 > 0$ [1]\n2. $(x+2)(x-2) > 0$ [1]\n3. x < -2 or x > 2 [1]",
+        "marks": 3
+    },
+    {
+        "id": "MATH003",
+        "subject": "Mathematics",
+        "topic": "Calculus",
+        "question_text": "Find $\\frac{dy}{dx}$ if $y = x\\sin(x)$.",
+        "question_type": "frq",
+        "answer": "sin(x) + xcos(x)",
+        "markscheme": "1. Use product rule: $\\frac{d}{dx}[uv] = u\\frac{dv}{dx} + v\\frac{du}{dx}$ [1]\n2. Let u = x and v = sin(x) [1]\n3. $\\frac{dy}{dx} = x\\cos(x) + \\sin(x)$ [1]",
+        "marks": 3
+    }
+]
