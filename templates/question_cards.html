@@ -10,10 +10,10 @@
         </div>
     </div>
 
-    <div class="question-text mathjax-content" data-markscheme="{{ question.markscheme | tojson | safe }}">
+    <div class="question-text mathjax-content">
         {{ question.question_text | safe }}
     </div>
-    
+
     {% if question.image_path %}
     <div class="question-image-container">
         <img src="{{ url_for('static', filename='question_images/' + question.image_path) }}" 
@@ -26,9 +26,9 @@
         {% if question.is_multiple_choice() %}
             <div class="options-container">
                 {% for letter, text in question.options.items() %}
-                <label class="option-label" data-option="{{ letter }}">
+                <label class="option-label">
                     <input type="radio" name="answer" value="{{ letter }}">
-                    <span>{{ letter }}: {{ text }}</span>
+                    <span>{{ letter }}. {{ text }}</span>
                 </label>
                 {% endfor %}
             </div>
@@ -38,16 +38,15 @@
                 <div class="dots">
                     <span></span><span></span><span></span>
                 </div>
-                <span>AI is grading your answer...</span>
+                <span>AI is evaluating your answer...</span>
             </div>
         {% endif %}
         <div class="button-group">
-            <button type="submit">Submit Answer</button>
+            <button type="submit" class="submit-button">Submit Answer</button>
             <button type="button" class="show-markscheme">Show Markscheme</button>
         </div>
+        <div class="feedback-container"></div>
     </form>
-
-    <div class="feedback-container"></div>
 
     <div class="chat-section">
         <div class="chat-header">

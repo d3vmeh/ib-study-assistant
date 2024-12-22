@@ -95,20 +95,27 @@ def filter_questions():
     subject = data.get('subject')
     topics = data.get('topics', [])
     
+    print(f"Filtering - Subject: {subject}, Topics: {topics}")  # Debug log
+    
     filtered_questions = question_bank.questions
     
     if subject:
         filtered_questions = [q for q in filtered_questions if q.subject == subject]
+        print(f"After subject filter: {len(filtered_questions)} questions")  # Debug log
     
     if topics:
         filtered_questions = [q for q in filtered_questions if q.topic in topics]
+        print(f"After topic filter: {len(filtered_questions)} questions")  # Debug log
     
+    # Sort questions by ID
     filtered_questions.sort(key=lambda q: q.id)
     
-    # Ensure LaTeX is not escaped
-    questions_html = render_template('question_cards.html', 
-                                  questions=filtered_questions)
+    # Debug log
+    print(f"Returning {len(filtered_questions)} questions")
+    for q in filtered_questions:
+        print(f"- {q.id}: {q.subject} - {q.topic}")
     
+    questions_html = render_template('question_cards.html', questions=filtered_questions)
     return jsonify({'html': questions_html})
 
 @app.route('/markscheme/<question_id>')

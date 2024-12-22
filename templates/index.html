@@ -86,31 +86,32 @@
         }
 
         .option-label {
-            display: flex;
-            align-items: center;
+            display: block;
             padding: 10px 15px;
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 5px;
+            margin: 8px 0;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .option-label:hover {
-            background: #e9ecef;
+            background-color: #f8f9fa;
         }
 
         .option-label.correct {
-            background: #d4edda;
-            border-color: #28a745;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
         }
 
         .option-label.incorrect {
-            background: #f8d7da;
-            border-color: #dc3545;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
         }
 
-        input[type="radio"] {
+        .option-label input[type="radio"] {
             margin-right: 10px;
         }
 
@@ -219,8 +220,7 @@
 
         .feedback-container {
             margin: 20px 0;
-            padding: 10px;
-            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
         .feedback {
@@ -229,6 +229,51 @@
             border-radius: 8px;
             border: 1px solid #dee2e6;
             margin-bottom: 15px;
+        }
+
+        .feedback.correct {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .feedback h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #495057;
+            font-size: 1.1em;
+        }
+
+        .feedback-content {
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        .loading-animation {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #dee2e6;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .frq-feedback {
@@ -728,6 +773,111 @@
         .overlay.active {
             display: block;
         }
+
+        .loading-animation {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+        }
+
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .feedback.loading {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+        }
+
+        .loading-animation p {
+            margin: 0;
+            color: #495057;
+            font-size: 0.95em;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Disable button styles */
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Submit loading indicator */
+        .submit-loading {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+            color: #495057;
+        }
+
+        .submit-loading .dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .submit-loading .dots span {
+            width: 8px;
+            height: 8px;
+            background: #3498db;
+            border-radius: 50%;
+            animation: bounce 0.5s alternate infinite;
+        }
+
+        .submit-loading .dots span:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .submit-loading .dots span:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-8px); }
+        }
+
+        .chat-message {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .user-message {
+            background: #007bff;
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai-message {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            margin-right: auto;
+        }
+
+        .error-message {
+            background: #dc3545;
+            color: white;
+            margin: 5px auto;
+            text-align: center;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px;
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -810,7 +960,7 @@
                             <span></span>
                             <span></span>
                         </div>
-                        <span>AI is grading your answer...</span>
+                        <span>AI is evaluating your answer...</span>
                     </div>
                 {% endif %}
                 <div class="button-group">
@@ -846,163 +996,307 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize all question cards
-            initializeQuestionCards();
-            
-            // Re-initialize after filtering
+            const subjectSelect = document.getElementById('subject-select');
+            const topicsContainer = document.getElementById('topics-container');
             const applyFiltersBtn = document.getElementById('apply-filters');
-            if (applyFiltersBtn) {
-                applyFiltersBtn.addEventListener('click', async () => {
-                    // ... your existing filter code ...
-                    initializeQuestionCards(); // Re-initialize after content update
+            const clearFiltersBtn = document.getElementById('clear-filters');
+            const questionsContainer = document.getElementById('questions-container');
+
+            // Show/hide topics based on subject selection
+            if (subjectSelect) {
+                subjectSelect.addEventListener('change', function() {
+                    const selectedSubject = this.value;
+                    document.querySelectorAll('.subject-topics').forEach(topicGroup => {
+                        if (!selectedSubject || topicGroup.dataset.subject === selectedSubject) {
+                            topicGroup.style.display = 'block';
+                        } else {
+                            topicGroup.style.display = 'none';
+                        }
+                    });
+                    topicsContainer.classList.add('show');
                 });
             }
+
+            // Apply filters
+            if (applyFiltersBtn) {
+                applyFiltersBtn.addEventListener('click', async function() {
+                    const selectedSubject = subjectSelect.value;
+                    const selectedTopics = Array.from(document.querySelectorAll('input[name="topic"]:checked'))
+                        .map(cb => cb.value);
+
+                    console.log('Applying filters:', { subject: selectedSubject, topics: selectedTopics }); // Debug log
+
+                    try {
+                        const response = await fetch('/filter_questions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                subject: selectedSubject,
+                                topics: selectedTopics
+                            })
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+                        console.log('Received filtered questions'); // Debug log
+                        
+                        questionsContainer.innerHTML = result.html;
+                        
+                        // Reinitialize question cards
+                        initializeQuestionCards();
+                        
+                        // Refresh MathJax
+                        if (window.MathJax) {
+                            MathJax.typesetPromise([questionsContainer]);
+                        }
+                    } catch (error) {
+                        console.error('Error applying filters:', error);
+                    }
+                });
+            }
+
+            // Clear filters
+            if (clearFiltersBtn) {
+                clearFiltersBtn.addEventListener('click', function() {
+                    subjectSelect.value = '';
+                    document.querySelectorAll('input[name="topic"]').forEach(cb => cb.checked = false);
+                    topicsContainer.classList.remove('show');
+                    applyFiltersBtn.click(); // Trigger filter update
+                });
+            }
+
+            // Initialize question cards
+            initializeQuestionCards();
         });
 
         function initializeQuestionCards() {
             document.querySelectorAll('.question-card').forEach(card => {
-                // Get elements
                 const form = card.querySelector('.answer-form');
-                const chatInput = card.querySelector('.chat-input-container textarea');
-                const sendButton = card.querySelector('.send-message');
-                const clearChatButton = card.querySelector('.clear-chat');
-                const showMarkschemeButton = card.querySelector('.show-markscheme');
-                const chatMessages = card.querySelector('.chat-messages');
                 const feedbackContainer = card.querySelector('.feedback-container');
                 
-                // 1. Submit Answer Handler
+                // Submit Answer Handler
                 if (form) {
-                    form.onsubmit = async (e) => {
-                        e.preventDefault();
-                        console.log('Form submitted'); // Debug log
+                    form.addEventListener('submit', async function(e) {
+                        e.preventDefault(); // Prevent form submission
                         
+                        const submitButton = this.querySelector('button[type="submit"]');
+                        const loadingIndicator = this.querySelector('.submit-loading');
+                        
+                        // Get the answer (works for both MCQ and FRQ)
                         const formData = new FormData(form);
                         const answer = formData.get('answer');
                         if (!answer) return;
-
+                        
+                        // Prevent multiple submissions
+                        if (submitButton.disabled) return;
+                        
+                        // Disable submit button and show loading
+                        submitButton.disabled = true;
+                        if (loadingIndicator) {
+                            loadingIndicator.style.display = 'flex';
+                        }
+                        
+                        // Show loading state in feedback container
+                        feedbackContainer.innerHTML = `
+                            <div class="feedback loading">
+                                <div class="loading-animation">
+                                    <div class="loading-spinner"></div>
+                                    <p>AI is evaluating your answer...</p>
+                                </div>
+                            </div>
+                        `;
+                        
                         try {
-                            const response = await fetch(`/answer/${form.dataset.questionId}`, {
+                            const response = await fetch(`/answer/${this.dataset.questionId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({ answer: answer })
                             });
-
-                            const result = await response.json();
-                            console.log('Response received:', result); // Debug log
-
-                            feedbackContainer.innerHTML = `
-                                <div class="feedback">
-                                    <h4>AI Feedback:</h4>
-                                    ${result.explanation || result.feedback}
-                                </div>
-                            `;
-
-                            if (window.MathJax) {
-                                MathJax.typesetPromise([feedbackContainer]);
+                            
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
                             }
-                        } catch (error) {
-                            console.error('Submit error:', error);
-                        }
-                    };
-                }
-
-                // 2. Show Markscheme Handler
-                if (showMarkschemeButton) {
-                    showMarkschemeButton.onclick = async () => {
-                        console.log('Show markscheme clicked'); // Debug log
-                        try {
-                            const response = await fetch(`/markscheme/${form.dataset.questionId}`);
+                            
                             const result = await response.json();
                             
-                            feedbackContainer.innerHTML = `
-                                <div class="markscheme">
-                                    <h4>Markscheme:</h4>
-                                    ${result.markscheme}
-                                </div>
-                            `;
-
+                            if (result.is_correct !== undefined) {
+                                // MCQ feedback
+                                feedbackContainer.innerHTML = `
+                                    <div class="feedback ${result.is_correct ? 'correct' : 'incorrect'}">
+                                        ${result.feedback}
+                                    </div>
+                                `;
+                            } else {
+                                // FRQ feedback
+                                feedbackContainer.innerHTML = `
+                                    <div class="feedback">
+                                        <h4>AI Feedback:</h4>
+                                        <div class="feedback-content">
+                                            ${result.explanation}
+                                        </div>
+                                    </div>
+                                `;
+                            }
+                            
+                            // Scroll to feedback
+                            feedbackContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            
+                            // Refresh MathJax
                             if (window.MathJax) {
                                 MathJax.typesetPromise([feedbackContainer]);
                             }
+                            
                         } catch (error) {
-                            console.error('Markscheme error:', error);
+                            console.error('Error submitting answer:', error);
+                            feedbackContainer.innerHTML = `
+                                <div class="feedback error">
+                                    <p>An error occurred while evaluating your answer. Please try again.</p>
+                                </div>
+                            `;
+                        } finally {
+                            // Re-enable submit button and hide loading
+                            submitButton.disabled = false;
+                            if (loadingIndicator) {
+                                loadingIndicator.style.display = 'none';
+                            }
                         }
-                    };
+                    });
                 }
-
-                // 3. Send Chat Message Handler
-                if (sendButton && chatInput) {
-                    sendButton.onclick = async () => {
-                        const content = chatInput.value.trim();
-                        if (!content) return;
-
-                        const typingIndicator = card.querySelector('.typing-indicator');
-                        chatInput.value = '';
-
-                        // Add user message
-                        const userMsg = document.createElement('div');
-                        userMsg.className = 'message user';
-                        userMsg.innerHTML = `<div class="message-content">${content}</div>`;
-                        chatMessages.appendChild(userMsg);
-
-                        if (typingIndicator) typingIndicator.style.display = 'block';
-
+                
+                // Show Markscheme Handler
+                const markschemeBtn = card.querySelector('.show-markscheme');
+                if (markschemeBtn) {
+                    markschemeBtn.addEventListener('click', async function() {
+                        const questionId = this.closest('.answer-form').dataset.questionId;
                         try {
-                            const response = await fetch(`/chat/${form.dataset.questionId}`, {
+                            const response = await fetch(`/markscheme/${questionId}`);
+                            const result = await response.json();
+                            
+                            if (!feedbackContainer.querySelector('.markscheme')) {
+                                feedbackContainer.innerHTML += `
+                                    <div class="markscheme">
+                                        <h4>Markscheme:</h4>
+                                        <div class="markscheme-content">
+                                            ${result.markscheme}
+                                        </div>
+                                    </div>
+                                `;
+                                
+                                // Refresh MathJax
+                                if (window.MathJax) {
+                                    MathJax.typesetPromise([feedbackContainer]);
+                                }
+                                
+                                // Update button text
+                                this.textContent = 'Hide Markscheme';
+                            } else {
+                                // Remove markscheme if it's already shown
+                                feedbackContainer.querySelector('.markscheme').remove();
+                                this.textContent = 'Show Markscheme';
+                            }
+                        } catch (error) {
+                            console.error('Error fetching markscheme:', error);
+                        }
+                    });
+                }
+                
+                // Chat Functionality
+                const chatSection = card.querySelector('.chat-section');
+                const chatMessages = chatSection.querySelector('.chat-messages');
+                const chatInput = chatSection.querySelector('textarea');
+                const sendButton = chatSection.querySelector('.send-message');
+                const clearChatButton = chatSection.querySelector('.clear-chat');
+                const typingIndicator = chatSection.querySelector('.typing-indicator');
+                
+                // Send Message Handler
+                if (sendButton && chatInput) {
+                    sendButton.addEventListener('click', async function() {
+                        const message = chatInput.value.trim();
+                        if (!message) return;
+                        
+                        // Prevent multiple sends
+                        if (sendButton.disabled) return;
+                        
+                        const questionId = card.querySelector('.answer-form').dataset.questionId;
+                        
+                        // Add user message to chat
+                        const userMessageDiv = document.createElement('div');
+                        userMessageDiv.className = 'chat-message user-message';
+                        userMessageDiv.textContent = message;
+                        chatMessages.appendChild(userMessageDiv);
+                        
+                        // Clear input and disable send button
+                        chatInput.value = '';
+                        sendButton.disabled = true;
+                        
+                        // Show typing indicator
+                        typingIndicator.style.display = 'flex';
+                        
+                        try {
+                            const response = await fetch(`/chat/${questionId}`, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify({ message: content })
+                                body: JSON.stringify({ message: message })
                             });
-
+                            
                             const result = await response.json();
                             
-                            if (typingIndicator) typingIndicator.style.display = 'none';
-
-                            const aiMsg = document.createElement('div');
-                            aiMsg.className = 'message ai';
-                            aiMsg.innerHTML = `<div class="message-content">${result.response}</div>`;
-                            chatMessages.appendChild(aiMsg);
-
-                            if (window.MathJax) {
-                                MathJax.typesetPromise([aiMsg]);
-                            }
-
+                            // Add AI response to chat
+                            const aiMessageDiv = document.createElement('div');
+                            aiMessageDiv.className = 'chat-message ai-message';
+                            aiMessageDiv.textContent = result.response;
+                            chatMessages.appendChild(aiMessageDiv);
+                            
+                            // Scroll to bottom
                             chatMessages.scrollTop = chatMessages.scrollHeight;
+                            
+                            // Refresh MathJax
+                            if (window.MathJax) {
+                                MathJax.typesetPromise([aiMessageDiv]);
+                            }
+                            
                         } catch (error) {
-                            console.error('Chat error:', error);
-                            if (typingIndicator) typingIndicator.style.display = 'none';
+                            console.error('Error sending message:', error);
+                            const errorDiv = document.createElement('div');
+                            errorDiv.className = 'chat-message error-message';
+                            errorDiv.textContent = 'Error sending message. Please try again.';
+                            chatMessages.appendChild(errorDiv);
+                        } finally {
+                            // Hide typing indicator and re-enable send button
+                            typingIndicator.style.display = 'none';
+                            sendButton.disabled = false;
                         }
-                    };
+                    });
                 }
-
-                // 4. Clear Chat Handler
+                
+                // Clear Chat Handler
                 if (clearChatButton) {
-                    clearChatButton.onclick = async () => {
+                    clearChatButton.addEventListener('click', async function() {
+                        const questionId = card.querySelector('.answer-form').dataset.questionId;
                         try {
-                            await fetch(`/clear-chat/${form.dataset.questionId}`, {
+                            await fetch(`/clear-chat/${questionId}`, {
                                 method: 'POST'
                             });
-                            
-                            const messages = chatMessages.querySelectorAll('.message:not(.typing-indicator)');
-                            messages.forEach(msg => msg.remove());
+                            chatMessages.innerHTML = `
+                                <div class="typing-indicator">
+                                    <div class="dots">
+                                        <span></span><span></span><span></span>
+                                    </div>
+                                </div>
+                            `;
                         } catch (error) {
-                            console.error('Clear chat error:', error);
+                            console.error('Error clearing chat:', error);
                         }
-                    };
-                }
-
-                // 5. Chat Enter Key Handler
-                if (chatInput) {
-                    chatInput.onkeypress = (e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            sendButton.click();
-                        }
-                    };
+                    });
                 }
             });
         }
