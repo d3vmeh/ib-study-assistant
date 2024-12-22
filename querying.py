@@ -46,11 +46,11 @@ def grade_frq_response(context, question):
     return response_text
 
 
-def encode_image_from_file(image_path);
+def encode_image_from_file(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
-def get_chat_response(context, question, image_url = None):
+def get_chat_response(context, question, image_name = None):
     llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.5)
 
     messages = [
@@ -69,16 +69,20 @@ def get_chat_response(context, question, image_url = None):
         {question}"""
     }
 
-    if image_url:
-        message_content = [
-            user_content,
-            {
+    if image_name:
+        image_path = os.path.join("static/question_images", image_name)
+        if os.path.exists(image_path):
+            base64_image = encode_image_from_file(image_path)
+            message_content = [
+                user_content,
+                {
                 "type": "image_url",
-                "image_url": image_url
+                "image_url": f"data:image/jpeg;base64,{base64_image}"
             }
         ]
-    else:
-        message_content = user_content
+        else:
+            message_content = user_content
+            print(f"Image {image_path} not found.")
     
     messages.append(HumanMessage(content=message_content))
 
