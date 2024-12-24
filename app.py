@@ -31,7 +31,6 @@ def submit_answer(question_id):
             'feedback': 'Correct!' if is_correct else 'Incorrect. Try again.'
         })
     else:
-        # For free response questions, use get_chat_response
         context = f"""
         Question: {question.question_text}
         Correct Answer: {question.answer}
@@ -74,7 +73,9 @@ def chat(question_id):
     Chat History:
     {question.chat_history}
     """
-    response = get_chat_response(context, data['message'])
+
+
+    response = get_chat_response(context, data['message'], image_name = question.id)
     # Add AI response to chat history
     question.add_to_chat_history("AI", response)
     
